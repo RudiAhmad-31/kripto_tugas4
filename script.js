@@ -7,7 +7,6 @@ function toggleInputs() {
     const blockInput = document.getElementById('block-input');
     const superInput = document.getElementById('super-input');
 
-    // Hide all
     caesarInput.style.display = 'none';
     vigenereInput.style.display = 'none';
     streamInput.style.display = 'none';
@@ -45,7 +44,7 @@ function caesarCipher(str, shift) {
 // Vigenère Cipher Function
 function vigenereCipher(str, key, encrypt = true) {
     key = key.toLowerCase();
-    let j = 0; // Key index tracker
+    let j = 0;
 
     return str.split('').map(char => {
         if (char.match(/[a-z]/i)) {
@@ -84,12 +83,12 @@ function streamCipher(text, key, encrypt = true) {
         for (let i = 0; i < text.length; i++) {
             const t = text.charCodeAt(i);
             const k = key.charCodeAt(i % key.length);
-            const c = t ^ k; // XOR
-            result += toHex(c); // encode ke hex
+            const c = t ^ k; 
+            result += toHex(c); 
         }
     } else {
         for (let i = 0; i < text.length; i += 2) {
-            const c = fromHex(text.substr(i, 2)); // ambil 2 hex
+            const c = fromHex(text.substr(i, 2)); 
             const k = key.charCodeAt((i / 2) % key.length);
             const p = c ^ k;
             result += String.fromCharCode(p);
@@ -107,10 +106,9 @@ function blockCipher(text, key, encrypt = true, blockSize = 4) {
             const t = text.charCodeAt(i);
             const k = key.charCodeAt(i % key.length);
             const c = t ^ k;
-            result += toHex(c); // simpan hasil XOR dalam hex
+            result += toHex(c);
         }
     } else {
-        // cek panjang input, harus genap (karena tiap 2 digit = 1 byte)
         if (text.length % 2 !== 0) {
             alert("Ciphertext tidak valid (harus hex dengan panjang genap).");
             return "";
@@ -121,41 +119,24 @@ function blockCipher(text, key, encrypt = true, blockSize = 4) {
             const p = c ^ k;
             result += String.fromCharCode(p);
         }
-        // hapus padding "X" yang ditambahkan saat enkripsi
         result = result.replace(/X+$/, "");
     }
     return result;
 }
 
 function superEncrypt(plaintext, caesarKey, vigenereKey, streamKey, blockKey) {
-    // Step 1: Caesar
     let step1 = caesarCipher(plaintext, caesarKey);
-
-    // Step 2: Vigenere
     let step2 = vigenereCipher(step1, vigenereKey, true);
-
-    // Step 3: Stream (hasil sudah hex string)
     let step3 = streamCipher(step2, streamKey, true);
-
-    // Step 4: Block (hasil sudah hex string)
     let step4 = blockCipher(step3, blockKey, true);
-
-    return step4; // ciphertext final dalam hex
+    return step4; 
 }
 
 function superDecrypt(ciphertext, caesarKey, vigenereKey, streamKey, blockKey) {
-    // Step 1: Block (input hex → output normal string)
     let step1 = blockCipher(ciphertext, blockKey, false);
-
-    // Step 2: Stream (input hex → output normal string)
     let step2 = streamCipher(step1, streamKey, false);
-
-    // Step 3: Vigenere (balikkan ke plaintext normal)
     let step3 = vigenereCipher(step2, vigenereKey, false);
-
-    // Step 4: Caesar (geser balik)
     let step4 = caesarCipher(step3, -caesarKey);
-
     return step4;
 }
 
